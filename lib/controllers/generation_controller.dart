@@ -1,6 +1,7 @@
 import 'dart:async';
-
+import 'dart:math';
 import 'package:auto_trainer/data/models/exercise.dart';
+import 'package:auto_trainer/data/models/set.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_trainer/data/repositories/trainer_repository.dart';
 import 'package:path/path.dart';
@@ -13,6 +14,9 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
   late List<Exercise> workout;
   late List<ExerciseDisplay> workoutDisplay = [];
   late List<Exercise> filteredExercises = [];
+  final random = Random();
+  int next(int min, int max) => min + random.nextInt(max - min);
+
   // @override
   // Future<List<ExerciseDisplay>> build() {
   //   return createWorkoutDisplay();
@@ -30,18 +34,68 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
   }
 
   complexQueryCaller() async {
-    await trainerRepo.complexQuery();
+    await trainerRepo.getAllExercises();
   }
 
   Future<void> createWorkoutDisplay(length, goal) async {
-    await getAllExercises();
-    var newWorkoutDisplay = [];
-    for (final exercise in filteredExercises) {
-      print(exercise);
-      newWorkoutDisplay.add(ExerciseDisplay(exercise: exercise));
-    }
-    state = [...newWorkoutDisplay];
     workoutDisplay.clear();
+    await getAllExercises();
+    int sets;
+    var reps;
+    int weight = 25;
+    int numberOfExercises = 1;
+    switch (goal) {
+      case 'Bodybuilding':
+        {
+          reps = 10;
+          sets = next(3, 5);
+        }
+      case 'Strength Gain':
+        {
+          reps = 6;
+          sets = next(2, 3);
+        }
+      default:
+        {
+          reps = 10;
+          sets = next(1, 4);
+        }
+    }
+    switch (length) {
+      case '15 min':
+        {
+          numberOfExercises = 3;
+        }
+      case '30 min':
+        {
+          numberOfExercises = 4;
+        }
+      case '45 min':
+        {
+          numberOfExercises = 6;
+        }
+      case '1 hour':
+        {
+          numberOfExercises = 8;
+        }
+    }
+    workoutDisplay = [];
+    for (var i = 0; i < numberOfExercises; i++) {
+      var exerciseSelector = next(0, filteredExercises.length);
+      print(filteredExercises[exerciseSelector]);
+      workoutDisplay.add(
+        ExerciseDisplay(
+          exercise: filteredExercises[exerciseSelector],
+          exerciseSets: [
+            WorkoutSet(reps: reps, weight: weight),
+            WorkoutSet(reps: reps, weight: weight),
+            WorkoutSet(reps: reps, weight: weight)
+          ],
+          id: i,
+        ),
+      );
+    }
+    state = [...workoutDisplay];
   }
 
   Future<void> filterWorkout(selectedSubFilters) async {
@@ -51,12 +105,28 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
     var subFilters = selectedSubFilters.values.toList();
     for (var i = 0; i < exercises.length; i++) {
       if (exercises[i].skill == subFilters[3]) {
-        print('inside if state');
         filteredExercises.add(exercises[i]);
       }
     }
+    // for (var exercise in filteredExercises) {
+    //   print(exercise.name);
+    // }
+    print(subFilters[0]);
     createWorkoutDisplay(subFilters[0], subFilters[2]);
   }
+
+  Future<void> removeSet(int id, var set) async {
+    // workoutDisplay[id].exerciseSets.remove(set);
+    // print([...workoutDisplay]);
+    print(workoutDisplay[id].exerciseSets[0].reps);
+  }
+
+  Future<void> logWorkout() async {
+    for (var exercise in workoutDisplay){
+      
+    }
+  }
+
 }
 
 final generationScreenControllerProvider =

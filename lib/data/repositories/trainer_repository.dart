@@ -17,7 +17,7 @@ class TrainerRepository {
     databaseMain = db;
   }
 
-  Future<List<Exercise>> getAllExercises() async {
+  Future<List<Exercise>> getAllExercisesBasic() async {
     var database = await DatabaseSetup.getDb();
     final List<Map<String, dynamic>> maps =
         await databaseMain.query('exercise');
@@ -34,20 +34,29 @@ class TrainerRepository {
     });
   }
 
-  complexQuery() async {
+  Future<List<Exercise>> getAllExercises() async {
     var database = await DatabaseSetup.getDb();
     final List<Map<String, dynamic>> maps = await databaseMain.rawQuery('''
  SELECT 
-      exercise.id AS exercise_id, exercise.name AS exercise_name, exercise.description, 
-      exercise.push, exercise.pull, exercise.skill, 
-      muscle.id AS muscle_id, muscle.name AS muscle_name, muscle_exercise.primary
+      exercise.id AS exercise_id, 
+      exercise.name AS exercise_name, 
+      exercise.description, 
+      exercise.push, 
+      exercise.pull, 
+      exercise.skill, 
+      muscle.id AS muscle_id, 
+      muscle.name AS muscle_name, 
+      muscle_exercise.primary_muscle
     FROM exercise
-    JOIN muscle_exercise ON exercise.id = muscle_exercise.exercise_id
-    JOIN muscle ON muscle.id = muscle_exercise.muscle_id;
+    INNER JOIN muscle_exercise ON exercise.id = muscle_exercise.exercise_id
+    INNER JOIN muscle ON muscle.id = muscle_exercise.muscle_id;
 ''');
     Map<int, Exercise> exerciseMap = {};
-    print(maps);
+    print('maps print:');
+    print(maps.length);
     for (var map in maps) {
+      print(map['exercise_name']);
+
       int exerciseId = map['exercise_id'];
       if (!exerciseMap.containsKey(exerciseId)) {
         exerciseMap[exerciseId] = Exercise(
@@ -63,7 +72,7 @@ class TrainerRepository {
       exerciseMap[exerciseId]!.muscles.add(Muscle(
             id: map['muscle_id'],
             name: map['muscle_name'],
-            primary: map['primary'] == 1,
+            primary: map['primary_muscle'] == 1,
           ));
 
       // for (var map in maps) {
