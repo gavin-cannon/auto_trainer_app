@@ -122,11 +122,13 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
   }
 
   Future<void> logWorkout() async {
-    for (var exercise in workoutDisplay){
-      
+    print('inside the generation controller');
+    for (var exercise in workoutDisplay) {
+      for (var set in exercise.exerciseSets) {
+        if (!set.completed) {}
+      }
     }
   }
-
 }
 
 final generationScreenControllerProvider =

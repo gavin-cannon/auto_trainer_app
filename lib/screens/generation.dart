@@ -17,12 +17,6 @@ class _GenerationState extends ConsumerState<Generation> {
   List<String> selectedAnswers = [];
   var activeScreen = 'start-screen';
 
-  void switchScreen() {
-    setState(() {
-      activeScreen = 'questions-screen';
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final generationController = ref.watch(generationScreenControllerProvider);
@@ -44,6 +38,18 @@ class _GenerationState extends ConsumerState<Generation> {
       });
       //TODO Handle filter selection logic here
       print('Selected filter: $filter');
+    }
+
+    void logWorkout() {
+      for (var item in generationController) {
+        for (var set in item.exerciseSets) {
+          if (!set.completed) {
+            showIncompleteWarning(context, ref);
+            return;
+          }
+        }
+      }
+      ref.read(generationScreenControllerProvider.notifier).logWorkout();
     }
 
     void _startWorkout() {
@@ -79,7 +85,9 @@ class _GenerationState extends ConsumerState<Generation> {
               },
             ),
             OutlinedButton.icon(
-              onPressed: ref.read(generationScreenControllerProvider.notifier).complexQueryCaller,
+              onPressed: ref
+                  .read(generationScreenControllerProvider.notifier)
+                  .complexQueryCaller,
               style: OutlinedButton.styleFrom(
                 foregroundColor: Colors.white,
               ),
@@ -104,6 +112,7 @@ class _GenerationState extends ConsumerState<Generation> {
                 // Button action goes here
                 // generationController.createWorkoutDisplay();
                 print('hello');
+                logWorkout();
               },
               style: ElevatedButton.styleFrom(
                 // Start of style parameter
@@ -121,7 +130,7 @@ class _GenerationState extends ConsumerState<Generation> {
                 overflow: TextOverflow.visible,
               ),
             ),
-             const SizedBox(height: 30),
+            const SizedBox(height: 30),
             // ClipOval(
             //   child:
 
@@ -153,4 +162,34 @@ class _GenerationState extends ConsumerState<Generation> {
       ),
     );
   }
+}
+
+void showIncompleteWarning(BuildContext context, WidgetRef ref) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('Sets Not Marked Complete'),
+        content: Text(
+            'Press Continue to log all sets including those that are not marked complete.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              ref
+                  .read(generationScreenControllerProvider.notifier)
+                  .logWorkout();
+              Navigator.of(context).pop();
+            },
+            child: Text('Continue'),
+          ),
+          TextButton(
+            child: Text('Close'),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    },
+  );
 }
