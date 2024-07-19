@@ -1,10 +1,15 @@
+import 'package:auto_trainer/data/models/exercise.dart';
+
 class Workout {
   Workout({
     required this.id,
-    this.date,
+    this.startDate,
+    this.endDate,
+    required this.session
   });
   final int id;
-  final date;
+  final startDate;
+  final endDate;
   List<dynamic> session = [];
 
 //  List ought to be Map of [{Exercise,  [{set: [reps, weight, etc]}] }]

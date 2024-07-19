@@ -9,12 +9,13 @@ class HostScreen extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _TabsScreenState();
+    return _HostScreenState();
   }
 }
 
-class _TabsScreenState extends State<HostScreen> {
+class _HostScreenState extends State<HostScreen> {
   int _selectedPageIndex = 0;
+  final PageController _pageController = PageController();
 
   void _selectPage(int index) {
     setState(() {
@@ -22,23 +23,38 @@ class _TabsScreenState extends State<HostScreen> {
       print(index);
       _selectedPageIndex = index;
     });
+    _pageController.jumpToPage(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget activePage = const Generation();
+    // Widget activePage = const Generation();
 
-    if (_selectedPageIndex == 1) {
-      activePage = const LogScreen();
-    }
-    if (_selectedPageIndex == 2) {
-      activePage = const ChallengeScreen();
-    }
-    if (_selectedPageIndex == 3) {
-      activePage = const ProfileScreen();
-    }
+    // if (_selectedPageIndex == 1) {
+    //   activePage = const LogScreen();
+    // }
+    // if (_selectedPageIndex == 2) {
+    //   activePage = const ChallengeScreen();
+    // }
+    // if (_selectedPageIndex == 3) {
+    //   activePage = const ProfileScreen();
+    // }
     return Scaffold(
-      body: activePage,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedPageIndex = index;
+          });
+        },
+        children: 
+          const <Widget>[
+            Generation(),
+            LogScreen(),
+            ChallengeScreen(),
+            ProfileScreen(),
+          ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: const <BottomNavigationBarItem>[

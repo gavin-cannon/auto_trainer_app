@@ -1,4 +1,5 @@
 import 'package:auto_trainer/data/models/muscle.dart';
+import 'package:auto_trainer/data/models/set.dart';
 
 class Exercise {
   Exercise({
@@ -13,15 +14,19 @@ class Exercise {
     this.secondaryMuscleGroups,
     required this.skill,
     this.reps,
-    this.sets,
+    this.workoutSets,
     //TODO add category to db
     this.category,
   });
+
+
+
   final int id;
   final String name;
   final String description;
   final bool push;
   final bool pull;
+
   //TODO Fix these typing START
   List<Muscle> muscles = [];
   List<String>? workoutHistory; // Example: List of dates or strings
@@ -30,11 +35,11 @@ class Exercise {
   List<String>? equipment;
   final String skill; // Example: Beginner, Intermediate, Advanced, Expert
   //TODO Fix these typing END
-  int? reps;
-  int? sets;
-  String? category;
 
-  //TODO create to and from json functions
+
+  int? reps;
+  List<WorkoutSet>? workoutSets;
+  String? category;
 
   Map<String, dynamic> toMap() {
     return {

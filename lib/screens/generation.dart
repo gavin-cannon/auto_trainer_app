@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:auto_trainer/widgets/filters_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,12 +15,36 @@ class Generation extends ConsumerStatefulWidget {
   }
 }
 
-class _GenerationState extends ConsumerState<Generation> {
+class _GenerationState extends ConsumerState<Generation>
+    with AutomaticKeepAliveClientMixin {
+  @override
+  bool get wantKeepAlive => true;
+
   List<String> selectedAnswers = [];
-  var activeScreen = 'start-screen';
+  String buttonLabel = 'GO!';
+  DateTime? startTime;
+  Timer? timer;
+  String elapsedTime = '00:00:00';
+  bool showFilterBar = true;
+
+  @override
+  void dispose() {
+    timer?.cancel();
+    super.dispose();
+  }
+
+  void startTimer() {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        final duration = DateTime.now().difference(startTime!);
+        elapsedTime = duration.toString().split('.').first.padLeft(8, "0");
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     final generationController = ref.watch(generationScreenControllerProvider);
 
     // generationController.getAllExercises();
@@ -32,6 +58,7 @@ class _GenerationState extends ConsumerState<Generation> {
       'Type of Exercise'
     ];
     String selectedFilter = 'Goal';
+
     void onFilterSelected(String filter) {
       setState(() {
         selectedFilter = filter;
@@ -40,20 +67,28 @@ class _GenerationState extends ConsumerState<Generation> {
       print('Selected filter: $filter');
     }
 
-    void logWorkout() {
+    void logWorkout(DateTime startTime) {
       for (var item in generationController) {
         for (var set in item.exerciseSets) {
           if (!set.completed) {
-            showIncompleteWarning(context, ref);
+            showIncompleteWarning(context, ref, startTime);
             return;
           }
         }
       }
-      ref.read(generationScreenControllerProvider.notifier).logWorkout();
+
+      ref
+          .read(generationScreenControllerProvider.notifier)
+          .logWorkout(startTime, DateTime.now());
     }
 
     void _startWorkout() {
-      print('nothing');
+      setState(() {
+        startTime = DateTime.now();
+        buttonLabel = 'LOG!';
+        showFilterBar = false;
+      });
+      startTimer();
     }
 
     return Container(
@@ -76,14 +111,24 @@ class _GenerationState extends ConsumerState<Generation> {
           mainAxisSize: MainAxisSize.max,
           children: [
             const SizedBox(height: 50),
-            FiltersBar(
-              onFilterSelected: (selectedSubFilters) {
-                print('Selected $selectedSubFilters');
-                ref
-                    .read(generationScreenControllerProvider.notifier)
-                    .filterWorkout(selectedSubFilters);
-              },
-            ),
+            if (!showFilterBar)
+              Text(
+                elapsedTime,
+                style: GoogleFonts.protestRiot(
+                  color: Color.fromARGB(255, 0, 191, 255),
+                  fontSize: 30,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            if (showFilterBar)
+              FiltersBar(
+                onFilterSelected: (selectedSubFilters) {
+                  print('Selected $selectedSubFilters');
+                  ref
+                      .read(generationScreenControllerProvider.notifier)
+                      .filterWorkout(selectedSubFilters);
+                },
+              ),
             OutlinedButton.icon(
               onPressed: ref
                   .read(generationScreenControllerProvider.notifier)
@@ -106,13 +151,19 @@ class _GenerationState extends ConsumerState<Generation> {
               ),
             ),
             const SizedBox(height: 30),
+
+            const SizedBox(height: 30),
             ElevatedButton(
               // Start of ElevatedButton widget
               onPressed: () {
                 // Button action goes here
                 // generationController.createWorkoutDisplay();
+                if (buttonLabel == 'GO!') {
+                  _startWorkout();
+                } else {
+                  logWorkout(startTime!);
+                }
                 print('hello');
-                logWorkout();
               },
               style: ElevatedButton.styleFrom(
                 // Start of style parameter
@@ -121,7 +172,7 @@ class _GenerationState extends ConsumerState<Generation> {
                 padding: EdgeInsets.all(10), // Padding property
               ),
               child: Text(
-                'GO!',
+                buttonLabel,
                 style: GoogleFonts.protestRiot(
                   color: Color.fromARGB(255, 0, 191, 255),
                   fontSize: 70,
@@ -135,16 +186,22 @@ class _GenerationState extends ConsumerState<Generation> {
             //   child:
 
             //   SizedBox(
-            //     width: 80,
-            //     height: 80,
+            //     width: 105,
+            //     height: 105,
             //     child: OutlinedButton.icon(
-            //       onPressed: startQuiz,
+            //       onPressed: () {
+            //          if (buttonLabel == 'GO!') {
+            //       _startWorkout();
+            //     } else {
+            //       logWorkout();
+            //     }
+            //       },
             //       style: OutlinedButton.styleFrom(
             //         foregroundColor: Colors.white,
             //       ),
             //       // icon: const Icon(Icons.arrow_right_alt),
             //       label: Expanded(
-            //         child: Text('GO!',
+            //         child: Text(buttonLabel,
             //             style: GoogleFonts.protestRiot(
             //               color: Colors.white,
             //               fontSize: 30,
@@ -164,7 +221,8 @@ class _GenerationState extends ConsumerState<Generation> {
   }
 }
 
-void showIncompleteWarning(BuildContext context, WidgetRef ref) {
+void showIncompleteWarning(
+    BuildContext context, WidgetRef ref, DateTime startTime) {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -177,7 +235,7 @@ void showIncompleteWarning(BuildContext context, WidgetRef ref) {
             onPressed: () {
               ref
                   .read(generationScreenControllerProvider.notifier)
-                  .logWorkout();
+                  .logWorkout(startTime, DateTime.now());
               Navigator.of(context).pop();
             },
             child: Text('Continue'),

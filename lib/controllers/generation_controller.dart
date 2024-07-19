@@ -39,7 +39,8 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
 
   Future<void> createWorkoutDisplay(length, goal) async {
     workoutDisplay.clear();
-    await getAllExercises();
+    // await getAllExercises();
+    state = workoutDisplay;
     int sets;
     var reps;
     int weight = 25;
@@ -84,7 +85,7 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
       var exerciseSelector = next(0, filteredExercises.length);
       print(filteredExercises[exerciseSelector]);
       workoutDisplay.add(
-        ExerciseDisplay(
+        new ExerciseDisplay(
           exercise: filteredExercises[exerciseSelector],
           exerciseSets: [
             WorkoutSet(reps: reps, weight: weight),
@@ -121,13 +122,17 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
     print(workoutDisplay[id].exerciseSets[0].reps);
   }
 
-  Future<void> logWorkout() async {
+  Future<void> logWorkout(DateTime startTime, DateTime endTime) async {
     print('inside the generation controller');
-    for (var exercise in workoutDisplay) {
-      for (var set in exercise.exerciseSets) {
-        if (!set.completed) {}
-      }
-    }
+
+    int newWorkoutId = await trainerRepo.createWorkout(startTime, endTime);
+    trainerRepo.logWorkout(workoutDisplay, newWorkoutId);
+
+    //   for (var exercise in workoutDisplay) {
+    //     for (var set in exercise.exerciseSets) {
+    //       if (!set.completed) {}
+    //     }
+    //   }
   }
 }
 

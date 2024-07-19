@@ -39,9 +39,9 @@ class _ExerciseDisplayState extends ConsumerState<ExerciseDisplay> {
         weightController: TextEditingController(text: set.weight.toString()),
         onDelete: () {
           setState(() {
-             widget.repsWeightTiles.removeWhere((item) => item.setObject == set);
+            widget.repsWeightTiles.removeWhere((item) => item.setObject == set);
             widget.exerciseSets.remove(set);
-           
+
             ref
                 .read(generationScreenControllerProvider.notifier)
                 .removeSet(widget.id, set);
@@ -52,6 +52,41 @@ class _ExerciseDisplayState extends ConsumerState<ExerciseDisplay> {
     }
   }
 
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _textEditingController.dispose();
+    super.dispose();
+  }
+  @override
+  void didUpdateWidget(covariant ExerciseDisplay oldWidget) {
+    // TODO: implement didUpdateWidget
+    if (oldWidget.repsWeightTiles != widget.repsWeightTiles){
+      int i = 0;
+    for (var set in widget.exerciseSets) {
+      widget.repsWeightTiles.add(RepsWeightTile(
+        id: i,
+        setObject: set,
+        reps: set.reps,
+        weight: set.weight!,
+        repsController: TextEditingController(text: set.reps.toString()),
+        weightController: TextEditingController(text: set.weight.toString()),
+        onDelete: () {
+          setState(() {
+            widget.repsWeightTiles.removeWhere((item) => item.setObject == set);
+            widget.exerciseSets.remove(set);
+
+            ref
+                .read(generationScreenControllerProvider.notifier)
+                .removeSet(widget.id, set);
+          });
+        },
+      ));
+      i++;
+    }
+    }
+    super.didUpdateWidget(oldWidget);
+  }
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -92,12 +127,13 @@ class _ExerciseDisplayState extends ConsumerState<ExerciseDisplay> {
                           TextEditingController(text: newItemWeight.toString()),
                       onDelete: () {
                         setState(() {
-                          widget.repsWeightTiles.removeWhere((item) => item.setObject == newSet);
-            widget.exerciseSets.remove(newSet);
-           
-            ref
-                .read(generationScreenControllerProvider.notifier)
-                .removeSet(widget.id, newSet);
+                          widget.repsWeightTiles
+                              .removeWhere((item) => item.setObject == newSet);
+                          widget.exerciseSets.remove(newSet);
+
+                          ref
+                              .read(generationScreenControllerProvider.notifier)
+                              .removeSet(widget.id, newSet);
                         });
                       },
                       reps: newItemReps,

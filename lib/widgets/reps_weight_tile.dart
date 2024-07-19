@@ -10,7 +10,7 @@ class RepsWeightTile extends StatefulWidget {
   final int id;
   final WorkoutSet setObject;
 
-  RepsWeightTile({
+  const RepsWeightTile({super.key, 
     required this.repsController,
     required this.weightController,
     required this.onDelete,
