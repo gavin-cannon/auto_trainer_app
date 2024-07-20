@@ -1,8 +1,8 @@
 class WorkoutSet {
   int reps;
-  int weight; // weight can be null if not applicable
-  double? resistance; // resistance can be null if not applicable
-  Duration? duration; // duration can be null if not applicable
+  int weight; 
+  double? resistance; 
+  Duration? duration; 
   bool completed;
   int? incline;
   int? distance;

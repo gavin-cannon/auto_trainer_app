@@ -26,7 +26,7 @@ class _GenerationState extends ConsumerState<Generation>
   Timer? timer;
   String elapsedTime = '00:00:00';
   bool showFilterBar = true;
-
+  bool buttonDisabled = false;
   @override
   void dispose() {
     timer?.cancel();
@@ -42,10 +42,21 @@ class _GenerationState extends ConsumerState<Generation>
     });
   }
 
+  Future<void> stopTimer() async {
+    if (timer != null && timer!.isActive) {
+      timer!.cancel();
+      await Future.delayed(Duration(seconds: 2));
+      setState(() {
+        elapsedTime = '00:00:00';
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
     final generationController = ref.watch(generationScreenControllerProvider);
+   
 
     // generationController.getAllExercises();
     // generationController.createWorkoutDisplay();
@@ -67,22 +78,40 @@ class _GenerationState extends ConsumerState<Generation>
       print('Selected filter: $filter');
     }
 
-    void logWorkout(DateTime startTime) {
+    Future<void> stopWorkout() async {
+      await stopTimer();
+      setState(() {
+        buttonLabel = 'GO!';
+        showFilterBar = true;
+      });
+    }
+
+    void logWorkout(DateTime startTime) async {
+      buttonDisabled = true;
       for (var item in generationController) {
         for (var set in item.exerciseSets) {
           if (!set.completed) {
-            showIncompleteWarning(context, ref, startTime);
-            return;
+            bool proceedToLog =
+                await showIncompleteWarning(context, ref, startTime);
+            if (proceedToLog) {
+              stopWorkout();
+              buttonDisabled = false;
+              return;
+            } else {
+              buttonDisabled = false;
+              return;
+            }
           }
         }
       }
-
+      await stopWorkout();
       ref
           .read(generationScreenControllerProvider.notifier)
           .logWorkout(startTime, DateTime.now());
+      buttonDisabled = false;
     }
 
-    void _startWorkout() {
+    void startWorkout() {
       setState(() {
         startTime = DateTime.now();
         buttonLabel = 'LOG!';
@@ -154,22 +183,22 @@ class _GenerationState extends ConsumerState<Generation>
 
             const SizedBox(height: 30),
             ElevatedButton(
-              // Start of ElevatedButton widget
-              onPressed: () {
-                // Button action goes here
-                // generationController.createWorkoutDisplay();
-                if (buttonLabel == 'GO!') {
-                  _startWorkout();
-                } else {
-                  logWorkout(startTime!);
-                }
-                print('hello');
-              },
+              onPressed: buttonDisabled
+                  ? () {
+                      print('button is disabled');
+                    }
+                  : () {
+                      // generationController.createWorkoutDisplay();
+                      if (buttonLabel == 'GO!') {
+                        startWorkout();
+                      } else {
+                        logWorkout(startTime!);
+                      }
+                    },
               style: ElevatedButton.styleFrom(
-                // Start of style parameter
                 splashFactory: NoSplash.splashFactory,
-                shape: CircleBorder(), // Shape property
-                padding: EdgeInsets.all(10), // Padding property
+                shape: CircleBorder(),
+                padding: EdgeInsets.all(10),
               ),
               child: Text(
                 buttonLabel,
@@ -221,9 +250,10 @@ class _GenerationState extends ConsumerState<Generation>
   }
 }
 
-void showIncompleteWarning(
-    BuildContext context, WidgetRef ref, DateTime startTime) {
-  showDialog(
+Future<bool> showIncompleteWarning(
+    BuildContext context, WidgetRef ref, DateTime startTime) async {
+  bool proceedToLog = false;
+  proceedToLog = await showDialog(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -232,22 +262,23 @@ void showIncompleteWarning(
             'Press Continue to log all sets including those that are not marked complete.'),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              ref
+            onPressed: () async {
+              await ref
                   .read(generationScreenControllerProvider.notifier)
                   .logWorkout(startTime, DateTime.now());
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(true);
             },
             child: Text('Continue'),
           ),
           TextButton(
             child: Text('Close'),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(false);
             },
           ),
         ],
       );
     },
   );
+  return proceedToLog;
 }

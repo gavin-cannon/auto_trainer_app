@@ -4,25 +4,20 @@ import 'package:auto_trainer/data/models/exercise.dart';
 import 'package:auto_trainer/data/models/muscle.dart';
 import 'package:auto_trainer/data/models/set.dart';
 import 'package:auto_trainer/data/models/workout.dart';
+import 'package:auto_trainer/widgets/workout_display.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_trainer/data/repositories/trainer_repository.dart';
-import 'package:path/path.dart';
 import 'package:auto_trainer/widgets/exercise_display.dart';
 
-class LogScreenController extends StateNotifier<List<ExerciseDisplay>> {
+class LogScreenController extends StateNotifier<List<WorkoutDisplay>> {
   LogScreenController() : super([]);
   late final TrainerRepository trainerRepo = TrainerRepository();
   late List<Exercise> exercises;
   late List<Exercise> workout;
-  late List<ExerciseDisplay> workoutDisplay = [];
-  late List<Exercise> filteredExercises = [];
+  late List<WorkoutDisplay> loggedWorkoutDisplay = [];
+
   final random = Random();
   int next(int min, int max) => min + random.nextInt(max - min);
-
-  // @override
-  // Future<List<ExerciseDisplay>> build() {
-  //   return createWorkoutDisplay();
-  // }
 
   Future<void> testFunction() async {
     print('hello');
@@ -33,12 +28,12 @@ class LogScreenController extends StateNotifier<List<ExerciseDisplay>> {
     return result;
   }
 
-  Future<List<dynamic>> createWorkoutLogDisplay() async {
+  Future<void> createWorkoutLogDisplay() async {
     var rawInformation = await getLoggedWorkouts();
     var workoutsMap = {};
     for (var map in rawInformation) {
-      print('inside for loop of function ');
-      print(map);
+      // print('inside for loop of function ');
+      // print(map);
       int workoutId = map['workout_id'];
       if (!workoutsMap.containsKey(workoutId)) {
         workoutsMap[workoutId] = Workout(
@@ -68,9 +63,13 @@ class LogScreenController extends StateNotifier<List<ExerciseDisplay>> {
             name: exerciseItem['muscle_name'],
             primary: exerciseItem['primary_muscle'] == 1));
       }
+      // var sessionKeys = workoutsMap[workoutId].session.toList();
 
+      // if (sessionKeys.contains(map['exercise_id'])) {
+      //   workoutsMap[workoutId].session[map['exercise_id']].add(WorkoutSet(reps: map[], weight: weight));
+      // }
       workoutsMap[workoutId].session.add({
-        exercise,
+        map['exercise_id'],
         WorkoutSet(
             reps: map['reps'],
             weight: map['weight'],
@@ -102,10 +101,15 @@ class LogScreenController extends StateNotifier<List<ExerciseDisplay>> {
       //   reps: map['reps'],
       //   weight: map['weight'], // Assuming weight is stored as a double
       // );
-
-      
     }
-    return workoutsMap.values.toList();
+
+    List<dynamic> workouts = workoutsMap.values.toList();
+    var workoutDisplayList = [];
+    for (var workoutItem in workouts) {
+      var display = WorkoutDisplay(workout: workoutItem, id: workoutItem.id);
+      workoutDisplayList.add(display);
+    }
+    state = [...workoutDisplayList];
   }
 }
 //  Map<int, Exercise> exerciseMap = {};
@@ -135,6 +139,6 @@ class LogScreenController extends StateNotifier<List<ExerciseDisplay>> {
 //           return exerciseMap.values.toList();
 
 final logScreenControllerProvider =
-    StateNotifierProvider<LogScreenController, List<ExerciseDisplay>>((ref) {
+    StateNotifierProvider<LogScreenController, List<WorkoutDisplay>>((ref) {
   return LogScreenController();
 });

@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:auto_trainer/data/dao/exercise_dao.dart';
 import 'package:auto_trainer/data/database_setup.dart';
+import 'package:auto_trainer/data/models/achievement.dart';
 import 'package:auto_trainer/data/models/exercise.dart';
 import 'package:auto_trainer/data/models/muscle.dart';
 import 'package:auto_trainer/data/models/set.dart';
@@ -184,12 +185,45 @@ class TrainerRepository {
   ''';
     final List<Map<String, dynamic>> result =
         await databaseMain.rawQuery(query);
-    print(result);
+    // print(result);
     return result;
   }
-  
-Future<List<Map<String, dynamic>>> getExerciseInfoById(int exerciseId) async {
-  const String query = '''
+
+  Future<int> getAllWorkoutsCount() async {
+    const String query = '''
+    SELECT COUNT(*) AS total_workouts
+    FROM workout;
+ ''';
+    final result = await databaseMain.rawQuery(query);
+    return result.first['total_workouts'] as int;
+  }
+
+  Future<int> getAllSetsCount() async {
+    const String query = '''
+    SELECT COUNT(*) AS total_sets
+    FROM workout_details;
+ ''';
+    final result = await databaseMain.rawQuery(query);
+    return result.first['total_sets'] as int;
+  }
+
+  Future<List<int>> getAllReps() async {
+    const String query = '''
+    SELECT reps 
+    FROM workout_details;
+ ''';
+    final result = await databaseMain.rawQuery(query);
+    List<int> repsList = [];
+    for (var row in result) {
+      if (row.containsKey('reps') && row['reps'] != null) {
+        repsList.add(row['reps'] as int);
+      }
+    }
+    return repsList;
+  }
+
+  Future<List<Map<String, dynamic>>> getExerciseInfoById(int exerciseId) async {
+    const String query = '''
   SELECT 
       exercise.id AS exercise_id, 
       exercise.name AS exercise_name, 
@@ -205,10 +239,66 @@ Future<List<Map<String, dynamic>>> getExerciseInfoById(int exerciseId) async {
     INNER JOIN muscle ON muscle.id = muscle_exercise.muscle_id
     WHERE exercise.id = ?;
   ''';
-  final List<Map<String, dynamic>> result = await databaseMain.rawQuery(query, [exerciseId]);
-  return result;
-}
-}
+    final List<Map<String, dynamic>> result =
+        await databaseMain.rawQuery(query, [exerciseId]);
+    return result;
+  }
 
+  Future<List<Map<String, dynamic>>> getAllAchievements() async {
+    const String query = '''
+    SELECT a.*
+    FROM 
+    achievement a
+''';
+    final List<Map<String, dynamic>> result =
+        await databaseMain.rawQuery(query);
+    return result;
+  }
+
+  Future<int?> getExerciseByName(String exerciseName) async {
+    const String query = '''
+SELECT 
+e.id
+FROM
+exercise e
+WHERE e.name = ?;
+''';
+
+    List<Map<String, dynamic>> result =
+        await databaseMain.rawQuery(query, [exerciseName]);
+
+    if (result.isNotEmpty) {
+      return result.first['id'] as int;
+    } else {
+      return null;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAllSetsByExerciseId(
+      int exerciseId) async {
+    String query = '''
+    SELECT 
+    wd.weight
+    FROM
+    workout_details wd
+    WHERE wd.exercise_id = ?;
+    ''';
+    List<Map<String, dynamic>> result =
+        await databaseMain.rawQuery(query, [exerciseId]);
+    return result;
+  }
+
+  Future<void> updateAchievement(Achievement achievement) async {
+    var outcome = await databaseMain.update(
+      'achievement',
+      achievement.toMap(),
+      where: 'id = ?',
+      whereArgs: [achievement.id],
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+
+    print(outcome);
+  }
+}
 
 final trainerRepositoryProvider = Provider((ref) => TrainerRepository());

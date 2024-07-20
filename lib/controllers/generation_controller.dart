@@ -125,9 +125,9 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
   Future<void> logWorkout(DateTime startTime, DateTime endTime) async {
     print('inside the generation controller');
 
+    var workout = [...workoutDisplay];
     int newWorkoutId = await trainerRepo.createWorkout(startTime, endTime);
-    trainerRepo.logWorkout(workoutDisplay, newWorkoutId);
-
+    trainerRepo.logWorkout(workout, newWorkoutId);
     //   for (var exercise in workoutDisplay) {
     //     for (var set in exercise.exerciseSets) {
     //       if (!set.completed) {}

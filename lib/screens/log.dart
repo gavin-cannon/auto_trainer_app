@@ -1,5 +1,7 @@
 import 'package:auto_trainer/controllers/log_controller.dart';
+import 'package:auto_trainer/data/models/workout.dart';
 import 'package:auto_trainer/widgets/filters_bar.dart';
+import 'package:auto_trainer/widgets/workout_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -19,8 +21,31 @@ class LogScreen extends ConsumerStatefulWidget {
 
 class _LogScreenState extends ConsumerState<LogScreen> {
   @override
+  void initState() {
+    // TODO: implement initState
+
+    super.initState();
+  }
+
+  @override
   Widget build(context) {
     final loggedWorkouts = ref.watch(logScreenControllerProvider);
+    int currentIndex = 0;
+void goToNextWorkout(List<Widget> loggedWorkouts) {
+    setState(() {
+      if (currentIndex < loggedWorkouts.length - 1) {
+        currentIndex++;
+      }
+    });
+  }
+
+    void goToPreviousWorkout() {
+      setState(() {
+        if (currentIndex > 0) {
+          currentIndex--;
+        }
+      });
+    }
 
     return Container(
       decoration: const BoxDecoration(
@@ -33,63 +58,80 @@ class _LogScreenState extends ConsumerState<LogScreen> {
           end: Alignment.bottomRight,
         ),
       ),
-      child: 
-      ElevatedButton(
-        // Start of ElevatedButton widget
-        onPressed: () {
-          // Button action goes here
-          // generationController.createWorkoutDisplay();
-          ref
-              .read(logScreenControllerProvider.notifier)
-              .createWorkoutLogDisplay();
-          print('hello');
-        },
-        style: ElevatedButton.styleFrom(
-          // Start of style parameter
-          splashFactory: NoSplash.splashFactory,
-          shape: CircleBorder(), // Shape property
-          padding: EdgeInsets.all(10), // Padding property
-        ),
-        child: Text(
-          'go',
-          style: GoogleFonts.protestRiot(
-            color: Color.fromARGB(255, 0, 191, 255),
-            fontSize: 70,
-            fontWeight: FontWeight.bold,
+      child: Column(
+        children: [
+          ElevatedButton(
+            // Start of ElevatedButton widget
+            onPressed: () {
+              // Button action goes here
+              // generationController.createWorkoutDisplay();
+              ref
+                  .read(logScreenControllerProvider.notifier)
+                  .createWorkoutLogDisplay();
+              print('hello');
+            },
+            style: ElevatedButton.styleFrom(
+              // Start of style parameter
+              splashFactory: NoSplash.splashFactory,
+              shape: CircleBorder(), // Shape property
+              padding: EdgeInsets.all(10), // Padding property
+            ),
+            child: Text(
+              'go',
+              style: GoogleFonts.protestRiot(
+                color: Color.fromARGB(255, 0, 191, 255),
+                fontSize: 70,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.visible,
+            ),
           ),
-          overflow: TextOverflow.visible,
-        ),
+          if (loggedWorkouts.isNotEmpty) ...[
+            Expanded(
+              child: CustomScrollView(
+                slivers: [
+                  SliverAppBar(
+                    pinned: true,
+                    flexibleSpace: FlexibleSpaceBar(
+                      title: Text(
+                        'Workout on ${(loggedWorkouts[currentIndex] as WorkoutDisplay).workout.startDate}',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      loggedWorkouts[currentIndex],
+                    ]),
+                  ),
+                ],
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: Icon(Icons.arrow_back),
+                  onPressed: currentIndex > 0 ? goToPreviousWorkout : null,
+                ),
+                IconButton(
+                  icon: Icon(Icons.arrow_forward),
+                  onPressed: currentIndex < loggedWorkouts.length - 1
+                      ? () => goToNextWorkout(loggedWorkouts)
+                      : null,
+                ),
+              ],
+            ),
+          ] else ...[
+            Center(
+              child: Text(
+                'No workouts logged yet',
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
+          ]
+        ],
       ),
-
-      //      PageView.builder(
-      //       reverse: true,
-      //   itemCount: loggedWorkouts.length,
-      //   itemBuilder: (context, index) {
-      //     return CustomScrollView(
-      //       slivers: [
-      //         SliverAppBar(
-      //           pinned: true,
-      //           flexibleSpace: FlexibleSpaceBar(
-      //             title: Text('Workout on',
-      //             style: TextStyle(color: Colors.white),
-      //             ),
-      //           ),
-      //         ),
-      //         SliverList(
-      //           delegate: SliverChildBuilderDelegate(
-      //             (context, i) {
-      //               return ListTile(
-      //                 title: Text('loggedWorkouts[index].exercises[i].name'),
-      //                 subtitle: Text('Sets: {loggedWorkouts[index].exercises[i].sets}, Reps: {loggedWorkouts[index].exercises[i].reps}'),
-      //               );
-      //             },
-      //             childCount: 1,
-      //           ),
-      //         ),
-      //       ],
-      //     );
-      //   },
-      // ),
     );
   }
 }

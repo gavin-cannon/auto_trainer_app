@@ -19,8 +19,6 @@ class Exercise {
     this.category,
   });
 
-
-
   final int id;
   final String name;
   final String description;
@@ -35,7 +33,6 @@ class Exercise {
   List<String>? equipment;
   final String skill; // Example: Beginner, Intermediate, Advanced, Expert
   //TODO Fix these typing END
-
 
   int? reps;
   List<WorkoutSet>? workoutSets;
