@@ -42,6 +42,7 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
     // await getAllExercises();
     state = workoutDisplay;
     int sets;
+    List<WorkoutSet> setList = [];
     var reps;
     int weight = 25;
     int numberOfExercises = 1;
@@ -81,6 +82,10 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
         }
     }
     workoutDisplay = [];
+
+    for (var i = 0; i < sets; i++) {
+      setList.add(WorkoutSet(reps: reps, weight: weight));
+    }
     for (var i = 0; i < numberOfExercises; i++) {
       var exerciseSelector = next(0, filteredExercises.length);
       print(filteredExercises[exerciseSelector]);
@@ -88,9 +93,7 @@ class GenerationScreenController extends StateNotifier<List<ExerciseDisplay>> {
         new ExerciseDisplay(
           exercise: filteredExercises[exerciseSelector],
           exerciseSets: [
-            WorkoutSet(reps: reps, weight: weight),
-            WorkoutSet(reps: reps, weight: weight),
-            WorkoutSet(reps: reps, weight: weight)
+           ...setList
           ],
           id: i,
         ),

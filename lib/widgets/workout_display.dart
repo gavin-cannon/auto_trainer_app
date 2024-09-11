@@ -29,41 +29,46 @@ class _WorkoutDisplayState extends ConsumerState<WorkoutDisplay> {
     // TODO: implement initState
     super.initState();
 
-    var setsMap = {};
+    var setsGroupsMaps = {};
 
     // for (var itemSet in widget.workout.session) {
-    //   for 
+    //   for
     // }
-    for (var itemSet in widget.workout.session) {
-      var item = itemSet.toList();
-      var setGroup = item[1].setGroup;
-      var exercise = item[0];
-      var workoutSet = item[1];
+    for (var item in widget.workout.session) {
+      if ( setsGroupsMaps.containsKey(item.setInfo.setGroup)){
 
-      if (!setsMap.containsKey(setGroup)) {
-        setsMap[setGroup] = {};
       }
+      item.setInfo.setGroup;
 
-      if (!setsMap[setGroup].containsKey(exercise)) {
-        setsMap[setGroup][exercise] = [];
-      }
-      for (var key in setsMap[setGroup].keys) {
-        if (key.id == exercise.id) {
-          setsMap[setGroup][key].add(workoutSet);
-        }
-      }
-      // setsMap[setGroup][exercise]!.add(workoutSet);
-    }
-    var groupedExerciseSets = setsMap.entries.toList();
-    int i = 0;
+      //   var item = itemSet.toList();
+      //   var setGroup = item[1].setGroup;
+      //   var exercise = item[0];
+      //   var workoutSet = item[1];
 
-    for (var exercise in groupedExerciseSets) {
-      print(exercise.value);
-      var exerciseObjects = exercise.value.keys.toList();
-      print(exerciseObjects);
-      var exerciseDisplay = ExerciseDisplay(
-          exercise: exerciseObjects[0], exerciseSets: exercise.value[1], id: i);
-      i++;
+      //   if (!setsMap.containsKey(setGroup)) {
+      //     setsMap[setGroup] = {};
+      //   }
+
+      //   if (!setsMap[setGroup].containsKey(exercise)) {
+      //     setsMap[setGroup][exercise] = [];
+      //   }
+      //   for (var key in setsMap[setGroup].keys) {
+      //     if (key.id == exercise.id) {
+      //       setsMap[setGroup][key].add(workoutSet);
+      //     }
+      //   }
+      //   // setsMap[setGroup][exercise]!.add(workoutSet);
+      // }
+      // var groupedExerciseSets = setsMap.entries.toList();
+      // int i = 0;
+
+      // for (var exercise in groupedExerciseSets) {
+      //   print(exercise.value);
+      //   var exerciseObjects = exercise.value.keys.toList();
+      //   print(exerciseObjects);
+      //   var exerciseDisplay = ExerciseDisplay(
+      //       exercise: exerciseObjects[0], exerciseSets: exercise.value[1], id: i);
+      //   i++;
     }
 
     // if (!setsMap.containsKey(item[0])) {

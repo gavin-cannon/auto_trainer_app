@@ -96,6 +96,7 @@ class TrainerRepository {
   }
 
   Future<void> logWorkout(List<ExerciseDisplay> workout, int workoutId) async {
+    int i = 0;
     for (ExerciseDisplay exerciseDis in workout) {
       for (WorkoutSet set in exerciseDis.exerciseSets) {
         await databaseMain.transaction((txn) async {
@@ -108,8 +109,9 @@ class TrainerRepository {
       distance,
       incline,
       weight,
-      set_group
-    ) VALUES (?, ?, ?, ?, ?, ?, ?)
+      set_group,
+      place_in_group
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     ''',
             [
               exerciseDis.exercise.id,
@@ -118,7 +120,8 @@ class TrainerRepository {
               set.distance ?? null,
               set.incline ?? null,
               set.weight,
-              exerciseDis.id
+              exerciseDis.id,
+              i,
             ],
           );
 
@@ -137,6 +140,7 @@ class TrainerRepository {
             ],
           );
         });
+        i++;
       }
     }
   }
@@ -167,21 +171,54 @@ class TrainerRepository {
   }
 
   Future<List<Map<String, dynamic>>> getAllWorkouts() async {
-    print('inside funciton call log');
     const String query = '''
     SELECT
-      wd.*, 
       w.id AS workout_id,
       w.start_date_time AS workout_start,
       w.end_date_time AS workout_end
     FROM 
-      workout_details wd
-    JOIN
-      workout_workout_details wwd ON wwd.workout_details_id = wd.workout_details_id
-    JOIN 
-      workout w ON wwd.workout_id = w.id
+      workout w
     ORDER BY 
       w.start_date_time DESC;
+  ''';
+    final List<Map<String, dynamic>> result =
+        await databaseMain.rawQuery(query);
+    // print(result);
+    return result;
+  }
+
+Future<List<Map<String, dynamic>>> getAllWorkoutsRefactor() async {
+    print('inside funciton call log');
+    const String query = '''
+    SELECT
+  wd.*, 
+  w.id AS workout_id,
+  w.start_date_time AS workout_start,
+  w.end_date_time AS workout_end,
+  e.id AS exercise_id,
+  e.name AS exercise_name,
+  e.description AS exercise_description,
+  e.push AS exercise_push,
+  e.pull AS exercise_pull,
+  e.skill AS exercise_skill,
+  muscle.id AS muscle_id, 
+  muscle.name AS muscle_name, 
+  muscle_exercise.primary_muscle AS primary_muscle
+FROM 
+  workout_details wd
+JOIN
+  workout_workout_details wwd ON wwd.workout_details_id = wd.workout_details_id
+JOIN 
+  workout w ON wwd.workout_id = w.id
+JOIN
+  exercise e ON e.id = wd.exercise_id
+JOIN 
+  muscle_exercise me ON e.id = me.exercise_id
+JOIN 
+  muscle ON muscle.id = me.muscle_id
+ORDER BY 
+  w.start_date_time DESC;
+
   ''';
     final List<Map<String, dynamic>> result =
         await databaseMain.rawQuery(query);

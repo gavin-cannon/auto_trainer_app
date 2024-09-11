@@ -5,6 +5,7 @@ import 'package:auto_trainer/widgets/workout_display.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:table_calendar/table_calendar.dart';
 // import 'package:quiz_app/data/questions.dart';
 // import 'package:quiz_app/questions_screen.dart';
 // import 'package:quiz_app/start_screen.dart';
@@ -29,15 +30,19 @@ class _LogScreenState extends ConsumerState<LogScreen> {
 
   @override
   Widget build(context) {
+    CalendarFormat _calendarFormat = CalendarFormat.month;
+  DateTime _focusedDay = DateTime.now();
+  DateTime? _selectedDay;
+  
     final loggedWorkouts = ref.watch(logScreenControllerProvider);
     int currentIndex = 0;
-void goToNextWorkout(List<Widget> loggedWorkouts) {
-    setState(() {
-      if (currentIndex < loggedWorkouts.length - 1) {
-        currentIndex++;
-      }
-    });
-  }
+    void goToNextWorkout(List<Widget> loggedWorkouts) {
+      setState(() {
+        if (currentIndex < loggedWorkouts.length - 1) {
+          currentIndex++;
+        }
+      });
+    }
 
     void goToPreviousWorkout() {
       setState(() {
@@ -59,7 +64,31 @@ void goToNextWorkout(List<Widget> loggedWorkouts) {
         ),
       ),
       child: Column(
-        children: [
+        children: [ TableCalendar(
+            firstDay: DateTime.utc(2020, 1, 1),
+            lastDay: DateTime.utc(2030, 12, 31),
+            focusedDay: _focusedDay,
+            calendarFormat: _calendarFormat,
+            selectedDayPredicate: (day) {
+              return isSameDay(_selectedDay, day);
+            },
+            onDaySelected: (selectedDay, focusedDay) {
+              setState(() {
+                _selectedDay = selectedDay;
+                _focusedDay = focusedDay;
+              });
+            },
+            onFormatChanged: (format) {
+              if (_calendarFormat != format) {
+                setState(() {
+                  _calendarFormat = format;
+                });
+              }
+            },
+            onPageChanged: (focusedDay) {
+              _focusedDay = focusedDay;
+            },
+          ),
           ElevatedButton(
             // Start of ElevatedButton widget
             onPressed: () {
