@@ -10,12 +10,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:auto_trainer/data/repositories/trainer_repository.dart';
 import 'package:auto_trainer/widgets/exercise_display.dart';
 
-class LogScreenController extends StateNotifier<List<WorkoutDisplay>> {
-  LogScreenController() : super([]);
+class LogScreenController extends StateNotifier<Map<DateTime, List<Workout>>> {
+  LogScreenController() : super({});
   late final TrainerRepository trainerRepo = TrainerRepository();
   late List<Exercise> exercises;
-  late List<Exercise> workout;
+  late List<Workout> workouts = [];
   late List<WorkoutDisplay> loggedWorkoutDisplay = [];
+  late Map<DateTime, List<Workout>> dateTimeWorkout = {};
 
   final random = Random();
   int next(int min, int max) => min + random.nextInt(max - min);
@@ -30,8 +31,52 @@ class LogScreenController extends StateNotifier<List<WorkoutDisplay>> {
   }
 
   Future<void> createWorkoutLogDisplay() async {
+    Map<DateTime, List<Workout>> newWorkoutLogs = {};
     var rawInfo = await getLoggedWorkouts();
     print(rawInfo);
+
+    for (var workoutMap in rawInfo) {
+      DateTime workoutDateAndTime = DateTime.parse(workoutMap['workout_end']);
+      DateTime workoutDateOnly = DateTime.utc(workoutDateAndTime.year,
+          workoutDateAndTime.month, workoutDateAndTime.day);
+
+      print(workoutDateOnly);
+      newWorkoutLogs.update(
+        workoutDateOnly,
+        (existingList) {
+          existingList.add(Workout(
+              id: workoutMap['workout_id'],
+              startDate: workoutMap['workout_start'],
+              endDate: workoutMap['workout_end'],
+              session: []));
+          return existingList.cast<Workout>();
+        },
+        ifAbsent: () {
+          return <Workout>[Workout(
+              id: workoutMap['workout_id'],
+              startDate: workoutMap['workout_start'],
+              endDate: workoutMap['workout_end'],
+              session: [])];
+        },
+      );
+
+      // if (newWorkoutLogs[workoutDateOnly]){
+      // }
+      // newWorkoutLogs[] = [
+      //   Workout(
+      //     id: workoutMap['workout_id'],
+      //     startDate: workoutMap['workout_start'],
+      //     endDate: workoutMap['workout_end'],
+      //     session: [],
+      //   )
+      // ];
+    }
+    // var newLoggedWorkouts = [];
+
+    // for (var workout in workouts) {
+    //   newLoggedWorkouts.add(WorkoutDisplay(workout: workout, id: workout.id));
+    // }
+    state = newWorkoutLogs;
   }
 }
 //  Map<int, Exercise> exerciseMap = {};
@@ -61,6 +106,7 @@ class LogScreenController extends StateNotifier<List<WorkoutDisplay>> {
 //           return exerciseMap.values.toList();
 
 final logScreenControllerProvider =
-    StateNotifierProvider<LogScreenController, List<WorkoutDisplay>>((ref) {
+    StateNotifierProvider<LogScreenController, Map<DateTime, List<Workout>>>(
+        (ref) {
   return LogScreenController();
 });

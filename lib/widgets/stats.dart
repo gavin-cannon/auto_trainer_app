@@ -27,7 +27,7 @@ class StatsWidget extends StatelessWidget {
         SizedBox(width: 20),
         Text(
           'Total Reps: $totalReps',
-          style: TextStyle(color: Colors.white),
+          style: const TextStyle(color: Colors.white),
         ),
       ],
     );

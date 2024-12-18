@@ -187,7 +187,7 @@ class TrainerRepository {
     return result;
   }
 
-Future<List<Map<String, dynamic>>> getAllWorkoutsRefactor() async {
+  Future<List<Map<String, dynamic>>> getAllWorkoutsRefactor() async {
     print('inside funciton call log');
     const String query = '''
     SELECT
@@ -257,6 +257,16 @@ ORDER BY
       }
     }
     return repsList;
+  }
+
+  Future<List<Map<String, dynamic>>> getWorkoutDetailsById(
+      int workoutId) async {
+    const String query = '''
+
+''';
+    final List<Map<String, dynamic>> result =
+        await databaseMain.rawQuery(query, [workoutId]);
+    return result;
   }
 
   Future<List<Map<String, dynamic>>> getExerciseInfoById(int exerciseId) async {
