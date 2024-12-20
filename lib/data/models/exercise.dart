@@ -8,11 +8,11 @@ class Exercise {
     required this.description,
     required this.push,
     required this.pull,
-    this.workoutHistory,
     required this.muscles,
+    required this.skill,
+    this.workoutHistory,
     this.primaryMuscleGroups,
     this.secondaryMuscleGroups,
-    required this.skill,
     this.reps,
     this.workoutSets,
     //TODO add category to db

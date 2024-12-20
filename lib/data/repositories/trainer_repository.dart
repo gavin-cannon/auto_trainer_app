@@ -262,8 +262,11 @@ ORDER BY
   Future<List<Map<String, dynamic>>> getWorkoutDetailsById(
       int workoutId) async {
     const String query = '''
-
-''';
+    SELECT * 
+    FROM workout_details wd 
+    INNER JOIN workout_workout_details wwd ON wd.workout_details_id = wwd.workout_details_id 
+    WHERE wwd.workout_id = ?;
+    ''';
     final List<Map<String, dynamic>> result =
         await databaseMain.rawQuery(query, [workoutId]);
     return result;

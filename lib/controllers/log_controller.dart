@@ -48,7 +48,7 @@ class LogScreenController extends StateNotifier<Map<DateTime, List<Workout>>> {
               id: workoutMap['workout_id'],
               startDate: workoutMap['workout_start'],
               endDate: workoutMap['workout_end'],
-              session: []));
+              session: {}));
           return existingList.cast<Workout>();
         },
         ifAbsent: () {
@@ -56,7 +56,7 @@ class LogScreenController extends StateNotifier<Map<DateTime, List<Workout>>> {
               id: workoutMap['workout_id'],
               startDate: workoutMap['workout_start'],
               endDate: workoutMap['workout_end'],
-              session: [])];
+              session: {})];
         },
       );
 

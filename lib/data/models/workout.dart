@@ -10,7 +10,7 @@ class Workout {
   final int id;
   final startDate;
   final endDate;
-  List<dynamic> session = [];
+  Map<int, dynamic> session = {};
 
 //  List ought to be Map of [{Exercise,  [{set: [reps, weight, etc]}] }]
 //  OR

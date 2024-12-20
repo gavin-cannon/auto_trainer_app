@@ -1,5 +1,6 @@
 import 'package:auto_trainer/controllers/log_controller.dart';
 import 'package:auto_trainer/data/models/workout.dart';
+import 'package:auto_trainer/screens/workout_edit.dart';
 import 'package:auto_trainer/widgets/filters_bar.dart';
 import 'package:auto_trainer/widgets/workout_display.dart';
 import 'package:flutter/material.dart';
@@ -285,7 +286,14 @@ class _LogScreenState extends ConsumerState<LogScreen> {
                           borderRadius: BorderRadius.circular(12.0),
                         ),
                         child: OutlinedButton(
-                          onPressed: () => _workoutModal(context, value[index]),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      WorkoutEditScreen(workout: value[index])),
+                            );
+                          },
                           child: Text('${value[index]}'),
                         )
 
@@ -377,6 +385,7 @@ class _LogScreenState extends ConsumerState<LogScreen> {
     );
   }
 }
+// () => _workoutModal(context, value[index])
 
 Future<void> _deleteModal(BuildContext context, Workout workout) {
   return showDialog<void>(

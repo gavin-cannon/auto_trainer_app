@@ -34,11 +34,11 @@ class _WorkoutDisplayState extends ConsumerState<WorkoutDisplay> {
     // for (var itemSet in widget.workout.session) {
     //   for
     // }
-    for (var item in widget.workout.session) {
-      if ( setsGroupsMaps.containsKey(item.setInfo.setGroup)){
+    // for (var item in widget.workout.session) {
+    //   if ( setsGroupsMaps.containsKey(item.setInfo.setGroup)){
 
-      }
-      item.setInfo.setGroup;
+    //   }
+    //   item.setInfo.setGroup;
 
       //   var item = itemSet.toList();
       //   var setGroup = item[1].setGroup;
@@ -69,7 +69,7 @@ class _WorkoutDisplayState extends ConsumerState<WorkoutDisplay> {
       //   var exerciseDisplay = ExerciseDisplay(
       //       exercise: exerciseObjects[0], exerciseSets: exercise.value[1], id: i);
       //   i++;
-    }
+    // }
 
     // if (!setsMap.containsKey(item[0])) {
     //   setsMap[item[0]] = [];
