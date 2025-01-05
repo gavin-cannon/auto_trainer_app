@@ -263,8 +263,9 @@ ORDER BY
       int workoutId) async {
     const String query = '''
     SELECT * 
-    FROM workout_details wd 
-    INNER JOIN workout_workout_details wwd ON wd.workout_details_id = wwd.workout_details_id 
+    FROM workout_details wd
+    INNER JOIN workout_workout_details wwd ON wd.workout_details_id = wwd.workout_details_id
+	INNER JOIN exercise ex ON wd.exercise_id = ex.id
     WHERE wwd.workout_id = ?;
     ''';
     final List<Map<String, dynamic>> result =
@@ -272,22 +273,12 @@ ORDER BY
     return result;
   }
 
-  Future<List<Map<String, dynamic>>> getExerciseInfoById(int exerciseId) async {
+  Future<List<Map<String, dynamic>>> getExerciseMuscleInfoById(
+      int exerciseId) async {
     const String query = '''
-  SELECT 
-      exercise.id AS exercise_id, 
-      exercise.name AS exercise_name, 
-      exercise.description, 
-      exercise.push, 
-      exercise.pull, 
-      exercise.skill, 
-      muscle.id AS muscle_id, 
-      muscle.name AS muscle_name, 
-      muscle_exercise.primary_muscle
-    FROM exercise
-    INNER JOIN muscle_exercise ON exercise.id = muscle_exercise.exercise_id
-    INNER JOIN muscle ON muscle.id = muscle_exercise.muscle_id
-    WHERE exercise.id = ?;
+    SELECT * FROM muscle m 
+    INNER JOIN muscle_exercise me ON m.id = me.muscle_id 
+    WHERE me.exercise_id = ?;
   ''';
     final List<Map<String, dynamic>> result =
         await databaseMain.rawQuery(query, [exerciseId]);
@@ -348,6 +339,14 @@ WHERE e.name = ?;
     );
 
     print(outcome);
+  }
+
+  Future<bool> deleteWorkoutAndDetailsById(int workoutId) async {
+    String query = '''
+    DELETE FROM workout WHERE id = ?;
+    ''';
+    bool result = await databaseMain.rawQuery(query, [workoutId]);
+    return result;
   }
 }
 

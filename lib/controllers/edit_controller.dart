@@ -19,24 +19,44 @@ class EditWorkoutScreenController extends StateNotifier<WorkoutState> {
   Future<void> fetchWorkout(Workout workout) async {
     final workoutDetails = await trainerRepo.getWorkoutDetailsById(workout.id);
     print(workoutDetails);
-    for (var workoutMap in workoutDetails) {
-      if (workout.session.containsKey(workoutMap['set_group'])) {
-        workout.session[workoutMap['set_group']].add(
+    for (var workoutMaps in workoutDetails) {
+      if (workout.session.containsKey(workoutMaps['set_group'])) {
+        workout.session[workoutMaps['set_group']].add(
           Exercise(
-            id: workoutMap['exercise_id'],
-            description: workout.session[workoutMap['set_group'][0].description],
-            muscles: workout.session[workoutMap['set_group'][0].muscles],
-            name: workout.session[workoutMap['set_group'][0].name],
-            pull: workout.session[workoutMap['set_group'][0].pull],
-            push: workout.session[workoutMap['set_group'][0].push],
-            skill: workout.session[workoutMap['set_group'][0].skill]
+            id: workoutMaps['exercise_id'],
+            description:
+                workout.session[workoutMaps['set_group']][0].description,
+            muscles: workout.session[workoutMaps['set_group']][0].muscles,
+            name: workout.session[workoutMaps['set_group']][0].name,
+            pull: workout.session[workoutMaps['set_group']][0].pull,
+            push: workout.session[workoutMaps['set_group']][0].push,
+            skill: workout.session[workoutMaps['set_group']][0].skill,
+            reps: workoutMaps['reps'],
+            weight: workoutMaps['weight'],
           ),
         );
       } else {
-        trainerRepo.getExerciseInfoById(workoutMap['exercise_id'])
-        workout.session[workoutMap['set_group']] = [Exercise()];
+        trainerRepo.getExerciseMuscleInfoById(workoutMaps['exercise_id']);
+        workout.session[workoutMaps['set_group']] = [
+          Exercise(
+            id: workoutMaps['exercise_id'],
+            description: workoutMaps['description'],
+            muscles: [],
+            name: workoutMaps['name'],
+            pull: workoutMaps['pull'] == 1,
+            push: workoutMaps['push'] == 1,
+            skill: workoutMaps['skill'],
+            reps: workoutMaps['reps'],
+            weight: workoutMaps['weight'],
+          )
+        ];
       }
     }
+    state = WorkoutState(status: WorkoutStatus.loaded, workout: workout);
+  }
+
+  Future<void> deleteWorkoutById(int id) async {
+    trainerRepo.deleteWorkoutAndDetailsById(id);
   }
 
   Future<String> testFunction() async {

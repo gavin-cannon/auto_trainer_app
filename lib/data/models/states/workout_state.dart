@@ -24,4 +24,5 @@ class WorkoutState {
       error: error,
     );
   }
+
 }

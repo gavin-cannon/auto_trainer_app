@@ -224,19 +224,19 @@ class _LogScreenState extends ConsumerState<LogScreen> {
           SizedBox(
             height: 50,
           ),
-          ElevatedButton(
-            onPressed: () {
-              ref
-                  .read(logScreenControllerProvider.notifier)
-                  .createWorkoutLogDisplay();
-              kWorkouts = loggedWorkouts;
-              print('this is working');
-            },
-            child: Text('Hello'),
-          ),
+          // ElevatedButton(
+          //   onPressed: () {
+          //     ref
+          //         .read(logScreenControllerProvider.notifier)
+          //         .createWorkoutLogDisplay();
+          //     kWorkouts = loggedWorkouts;
+          //     print('this is working');
+          //   },
+          //   child: Text('Hello'),
+          // ),
           TableCalendar<Workout>(
             firstDay: DateTime.utc(2024, 1, 1),
-            lastDay: DateTime.utc(2024, 12, 31),
+            lastDay: DateTime.utc(2025, 12, 31),
             focusedDay: _focusedDay,
             selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
             rangeStartDay: _rangeStart,

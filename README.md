@@ -1,16 +1,8 @@
 # auto_trainer
 
-A new Flutter project.
+This is app is a fitness trainer for your phone. It was originally my Senior Project, but is something I have wanted since my Junior year of college. I have enjoyed development thus far. I mostly did development for the web or desktop computers in school and I was really interested in making an app for my phone. The idea of making software I could take with me anywhere sounded really fun. Being able to create something helpful for my friends and family sounded rewarding. I used to go the gym everyday, and as I've been getting back into working out I've wanted a way to generate workouts for myself so I don't have to do all that leg work. I looked at about a dozen workout generators on the Google Play Store looking for areas I could add, what I could draw inspiration from and what I hated. I was shocked how blue this ocean was and so I'm excited to make my contribution.
 
-## Getting Started
+## Dev Logs
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- [Dev 19th, 2024](https://youtu.be/AmgXUzJ9PVc)
+- [Jan 4th, 2025](https://youtu.be/TVk-xQdnN6g)

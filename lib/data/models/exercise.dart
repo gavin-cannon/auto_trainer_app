@@ -15,6 +15,7 @@ class Exercise {
     this.secondaryMuscleGroups,
     this.reps,
     this.workoutSets,
+    this.weight,
     //TODO add category to db
     this.category,
   });
@@ -35,6 +36,7 @@ class Exercise {
   //TODO Fix these typing END
 
   int? reps;
+  int? weight;
   List<WorkoutSet>? workoutSets;
   String? category;
 
