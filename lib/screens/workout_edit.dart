@@ -50,32 +50,42 @@ class _WorkoutEditScreenState extends ConsumerState<WorkoutEditScreen> {
                 child: Text('Edit'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  AlertDialog(
-                    title: const Text('Delete Workout'),
-                    content: Text(
-                      'Are you sure you want to delete the workout ? This action cannot be undone.',
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.of(context)
-                            .pop(false), // Return false on Cancel
-                        child: const Text('Cancel'),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                        ),
-                        onPressed: () => Navigator.of(context)
-                            .pop(true), // Return true on Confirm
-                        child: const Text('Yes, delete'),
-                      ),
-                    ],
-                  );
-                  ref
-                      .read(editWorkoutScreenControllerProvider(widget.workout)
-                          .notifier)
-                      .deleteWorkoutById(widget.workout.id);
+                onPressed: () async {
+                  bool? choice = await _deleteModal(context, widget.workout);
+                  if (choice == true) {
+                    ref
+                        .read(editWorkoutScreenControllerProvider(widget.workout)
+                            .notifier)
+                        .deleteWorkoutById(widget.workout.id);
+                  }
+
+                  // AlertDialog(
+                  //   title: const Text('Delete Workout'),
+                  //   content: Text(
+                  //     'Are you sure you want to delete the workout ? This action cannot be undone.',
+                  //   ),
+                  //   actions: [
+                  //     TextButton(
+                  //       onPressed: () => Navigator.of(context)
+                  //           .pop(false), // Return false on Cancel
+                  //       child: const Text('Cancel'),
+                  //     ),
+                  //     ElevatedButton(
+                  //       style: ElevatedButton.styleFrom(
+                  //         backgroundColor: Colors.red,
+                  //       ),
+                  //       onPressed: () => Navigator.of(context)
+                  //           .pop(true), // Return true on Confirm
+                  //       child: const Text('Yes, delete'),
+                  //     ),
+                  //   ],
+                  // );
+
+
+                  // ref
+                  //     .read(editWorkoutScreenControllerProvider(widget.workout)
+                  //         .notifier)
+                  //     .deleteWorkoutById(widget.workout.id);
                 },
                 child: Text('Delete'),
               ),
@@ -112,8 +122,8 @@ class _WorkoutEditScreenState extends ConsumerState<WorkoutEditScreen> {
   }
 }
 
-Future<void> _deleteModal(BuildContext context, Workout workout) {
-  return showDialog<void>(
+Future<bool?> _deleteModal(BuildContext context, Workout workout) async {
+  return showDialog<bool>(
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
@@ -127,7 +137,7 @@ Future<void> _deleteModal(BuildContext context, Workout workout) {
             ),
             child: const Text('Cancel'),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(false);
             },
           ),
           TextButton(
@@ -136,7 +146,7 @@ Future<void> _deleteModal(BuildContext context, Workout workout) {
             ),
             child: const Text('Confirm Delete'),
             onPressed: () {
-              Navigator.of(context).pop();
+              Navigator.of(context).pop(true);
             },
           ),
         ],
